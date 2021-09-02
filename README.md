@@ -9,7 +9,7 @@ Nosso passatempo favorito nessa quarentena tem sido assistir filmes e seriados, 
 - Permitir que removamos um filme de nossos favoritos (às vezes um filme enjoa)
 - Listar nossos filmes favoritos
 
-Para facilitar um pouco mais as coisas, já deixamos separada uma chave de acesso para a API (ou você pode criar a sua também):
+Esse é um exemplo de API que esperamos para este desafio:
 
 ```
 Chave de API: 925eba28
