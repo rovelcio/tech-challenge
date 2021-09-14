@@ -24,7 +24,7 @@ Exemplo requisição: GET http://www.omdbapi.com/?apikey=925eba28&s=batman
 ### Observações:
 * Pode ser utilizado qualquer banco de dados;
 * Stack de preferência: Node.js;
-* Não é necessária a implementação do frontend;
+* Caso deseje implementar o frontend a Stack de preferência é React ou React-Native;
 * Será um diferencial se a aplicação estiver hospedada em algum provedor;
 * É importante que haja uma descrição de como realizar o teste da solução.
 
