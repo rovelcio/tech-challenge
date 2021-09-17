@@ -59,6 +59,7 @@ Resources:
       Environment:
         Variables:
           MOVIESTABLE: !Ref TableMovies
+          APIKEY: 925eba2
       Events:
         ApiKey:
           Type: Api
