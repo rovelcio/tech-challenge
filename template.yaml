@@ -1,0 +1,126 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: >-
+  tech-challenge-sthima
+
+Transform:
+  - AWS::Serverless-2016-10-31
+
+Resources:
+  APIMovies:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: Prod
+      Auth:
+        ApiKeyRequired: true
+
+  TableMovies:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      AttributeDefinitions:
+        - AttributeName: "movieImdbId"
+          AttributeType: "S"
+        - AttributeName: "movieYear"
+          AttributeType: "N"
+      KeySchema:
+        - AttributeName: "hashKey"
+          KeyType: "HASH"
+        - AttributeName: "sortKey"
+          KeyType: "RANGE"
+      ProvisionedThroughput:
+        ReadCapacityUnits: 5
+        WriteCapacityUnits: 5
+
+  LayerTypescriptDependencies:
+    Type: AWS::Serverless::LayerVersion
+    Metadata:
+      BuildMethod: makefile
+    Properties:
+      Description: Common runtime dependencies for Lambdas (public and private packages).
+      ContentUri: ./
+      CompatibleRuntimes:
+        - nodejs14.x
+      RetentionPolicy: Retain
+
+  FunctionSearchMovies:
+    Type: AWS::Serverless::Function
+    Metadata:
+      BuildMethod: makefile
+    Properties:
+      Handler: dist/functions/SearchMovies
+      Description: A function that searches for a movie from the given string.
+      Runtime: nodejs14.x
+      MemorySize: 128
+      Timeout: 60
+      Policies:
+        - DynamoDBWritePolicy:
+            TableName: !Ref TableMovies
+      Layers:
+        - !Ref LayerTypescriptDependencies
+      Environment:
+        Variables:
+          MOVIESTABLE: !Ref TableMovies
+      Events:
+        ApiKey:
+          Type: Api
+          Properties:
+            RestApiId: !Ref APIMovies
+            Path: /movie/search
+            Method: POST
+            Auth:
+              ApiKeyRequired: true
+
+  FunctionBookmarkMovie:
+    Type: AWS::Serverless::Function
+    Metadata:
+      BuildMethod: makefile
+    Properties:
+      Handler: dist/functions/BookmarkMovie
+      Description: A function that bookmarks a movie from the given imdbID.
+      Runtime: nodejs14.x
+      MemorySize: 128
+      Timeout: 60
+      Policies:
+        - DynamoDBWritePolicy:
+            TableName: !Ref TableMovies
+      Layers:
+        - !Ref LayerTypescriptDependencies
+      Environment:
+        Variables:
+          MOVIESTABLE: !Ref TableMovies
+      Events:
+        ApiKey:
+          Type: Api
+          Properties:
+            RestApiId: !Ref APIMovies
+            Path: /movie/bookmarks/{imdbID}/add
+            Method: POST
+            Auth:
+              ApiKeyRequired: true
+
+  FunctionListBookmarkedMovies:
+    Type: AWS::Serverless::Function
+    Metadata:
+      BuildMethod: makefile
+    Properties:
+      Handler: dist/functions/ListBookmarkedMovies
+      Description: A function that lists bookmarked movies.
+      Runtime: nodejs14.x
+      MemorySize: 128
+      Timeout: 60
+      Policies:
+        - DynamoDBReadPolicy:
+            TableName: !Ref TableMovies
+      Layers:
+        - !Ref LayerTypescriptDependencies
+      Environment:
+        Variables:
+          MOVIESTABLE: !Ref TableMovies
+      Events:
+        ApiKey:
+          Type: Api
+          Properties:
+            RestApiId: !Ref APIMovies
+            Path: /movie/bookmarks/list
+            Method: POST
+            Auth:
+              ApiKeyRequired: true

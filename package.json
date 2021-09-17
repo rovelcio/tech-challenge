@@ -1,0 +1,40 @@
+{
+  "name": "tech-challenge",
+  "version": "0.0.1",
+  "description": "Implementaçao da Tech Challenge Sthima por Rovelcio Junior.",
+  "private": true,
+  "scripts": {
+    "build": "tsc",
+    "deploy": "rm -rf .aws-sam/ dist/ && sam build && sam deploy",
+    "test": "jest"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/rovelcio/tech-challenge.git"
+  },
+  "keywords": [
+    "coding-challenge"
+  ],
+  "author": "Rovelcio Junior <rovelciojr@gmail.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/rovelcio/tech-challenge/issues"
+  },
+  "homepage": "https://github.com/rovelcio/tech-challenge#readme",
+  "dependencies": {
+    "aws-sdk": "^2.989.0",
+    "axios": "^0.21.4",
+    "source-map-support": "^0.5.20"
+  },
+  "devDependencies": {
+    "@types/aws-lambda": "^8.10.83",
+    "@types/aws-sdk": "^2.7.0",
+    "@types/axios": "^0.14.0",
+    "@types/jest": "^27.0.1",
+    "@types/node": "^16.9.1",
+    "jest": "^27.2.0",
+    "ts-jest": "^27.0.5",
+    "ts-node": "^10.2.1",
+    "typescript": "^4.4.3"
+  }
+}
