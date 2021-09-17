@@ -5,8 +5,8 @@
   "private": true,
   "scripts": {
     "build": "tsc",
-    "deploy": "rm -rf .aws-sam/ dist/ && sam build && sam deploy",
-    "test": "jest"
+    "deploy": "rm -rf .aws-sam/ dist/ && npm run test && sam build && sam deploy",
+    "test": "jest --verbose"
   },
   "repository": {
     "type": "git",

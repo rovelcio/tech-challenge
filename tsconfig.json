@@ -9,9 +9,13 @@
     "lib": ["es2020"],
     "target": "es2019",
     "outDir": "./dist",
-    "rootDir": "./src",
+    "rootDir": "./",
     "baseUrl": "./",
-    "paths": {}
+    "paths": {
+      "#functions/*": ["./src/functions/*"],
+      "#lib/*": ["./src/lib/*"],
+      "#types/*": ["./src/types/*"]
+    }
   },
-  "include": ["src/**/*.ts", "src/**/*.js"]
+  "include": ["src/**/*.ts", "src/**/*.js", "tests/**/*.ts", "tests/**/*.js"]
 }
