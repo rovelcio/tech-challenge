@@ -2,8 +2,8 @@ import "source-map-support/register";
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from "aws-lambda";
 import { APIGatewayResponse } from "../lib/APIGatewayResponse";
 
-export default async function BookmarkMovie(
+export const BookmarkMovie = async (
   event: APIGatewayProxyEvent
-): Promise<APIGatewayProxyResult> {
+): Promise<APIGatewayProxyResult> => {
   return APIGatewayResponse.build(200, {});
-}
+};
