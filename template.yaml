@@ -5,6 +5,23 @@ Description: >-
 Transform:
   - AWS::Serverless-2016-10-31
 
+Globals:
+  Function:
+    Environment:
+      Variables:
+        APIKEY: 925eba2
+        MOVIESTABLE: !Ref TableMovies
+        MOVIESTABLE_HASHKEY: movieItemType
+        MOVIESTABLE_SORTKEY: movieCompositeImdbID
+        HASH_MOVIES: movie
+        HASH_BOOKMARK: bookmark
+        HASH_CACHE: cache
+    Layers:
+      - !Ref LayerTypescriptDependencies
+    Runtime: nodejs14.x
+    MemorySize: 128
+    Timeout: 60
+
 Resources:
   APIMovies:
     Type: AWS::Serverless::Api
@@ -46,24 +63,11 @@ Resources:
     Properties:
       Handler: dist/src/functions/SearchMovies.SearchMovies
       Description: A function that searches for a movie from the given string.
-      Runtime: nodejs14.x
-      MemorySize: 128
-      Timeout: 60
       Policies:
         - DynamoDBReadPolicy:
             TableName: !Ref TableMovies
         - DynamoDBWritePolicy:
             TableName: !Ref TableMovies
-      Layers:
-        - !Ref LayerTypescriptDependencies
-      Environment:
-        Variables:
-          MOVIESTABLE: !Ref TableMovies
-          MOVIESTABLE_HASHKEY: movieItemType
-          MOVIESTABLE_SORTKEY: movieCompositeImdbID
-          HASH_MOVIES: movie
-          HASH_BOOKMARKS: bookmark
-          APIKEY: 925eba2
       Events:
         ApiKey:
           Type: Api
@@ -79,17 +83,9 @@ Resources:
     Properties:
       Handler: dist/src/functions/BookmarkMovie.BookmarkMovie
       Description: A function that bookmarks a movie from the given imdbID.
-      Runtime: nodejs14.x
-      MemorySize: 128
-      Timeout: 60
       Policies:
         - DynamoDBWritePolicy:
             TableName: !Ref TableMovies
-      Layers:
-        - !Ref LayerTypescriptDependencies
-      Environment:
-        Variables:
-          MOVIESTABLE: !Ref TableMovies
       Events:
         ApiKey:
           Type: Api
@@ -105,17 +101,9 @@ Resources:
     Properties:
       Handler: dist/src/functions/ListBookmarkedMovies.ListBookmarkedMovies
       Description: A function that lists bookmarked movies.
-      Runtime: nodejs14.x
-      MemorySize: 128
-      Timeout: 60
       Policies:
         - DynamoDBReadPolicy:
             TableName: !Ref TableMovies
-      Layers:
-        - !Ref LayerTypescriptDependencies
-      Environment:
-        Variables:
-          MOVIESTABLE: !Ref TableMovies
       Events:
         ApiKey:
           Type: Api
