@@ -1,4 +1,4 @@
-import { Movie } from "../../src/types/data/Movie";
+import { Movie } from "../../src/model/data/Movie";
 import { IMDBClient } from "../../src/lib/IMDBClient";
 
 const imdbClient = new IMDBClient("925eba28");

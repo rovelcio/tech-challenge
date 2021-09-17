@@ -1,5 +1,5 @@
 import Axios, { AxiosInstance } from "axios";
-import { Movie, RawMovie } from "../types/data/Movie";
+import { Movie, RawMovie } from "../model/data/Movie";
 
 interface IMDBClientInterface {
   searchMoviesByName(name: string): Promise<Array<Movie>>;
@@ -17,6 +17,7 @@ export class IMDBClient implements IMDBClientInterface {
     this._apiClient.interceptors.request.use((configuration) => {
       configuration.params = {
         apiKey,
+        type: "movie",
         ...configuration.params,
       };
       return configuration;
