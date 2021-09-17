@@ -1,11 +1,11 @@
 import "source-map-support/register";
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from "aws-lambda";
 import { APIGatewayResponse } from "../lib/APIGatewayResponse";
-import { DynamoDBClient } from "../lib/DynamoDBClient";
 import { IMDBClient } from "../lib/IMDBClient";
 import { SearchPayload } from "../types/functions/SearchMovieTypes";
+import { DynamoDBMovieClient } from "../lib/DynamoDBMovieClient";
 
-const dynamoDbClient = new DynamoDBClient();
+const dynamoDbClient = new DynamoDBMovieClient();
 const imdbClient = new IMDBClient();
 
 export const SearchMovies = async (
