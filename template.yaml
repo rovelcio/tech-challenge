@@ -10,21 +10,19 @@ Resources:
     Type: AWS::Serverless::Api
     Properties:
       StageName: Prod
-      Auth:
-        ApiKeyRequired: true
 
   TableMovies:
     Type: AWS::DynamoDB::Table
     Properties:
       AttributeDefinitions:
-        - AttributeName: "movieImdbId"
+        - AttributeName: "movieItemType"
           AttributeType: "S"
-        - AttributeName: "movieYear"
-          AttributeType: "N"
+        - AttributeName: "movieCompositeImdbID"
+          AttributeType: "S"
       KeySchema:
-        - AttributeName: "hashKey"
+        - AttributeName: "movieItemType"
           KeyType: "HASH"
-        - AttributeName: "sortKey"
+        - AttributeName: "movieCompositeImdbID"
           KeyType: "RANGE"
       ProvisionedThroughput:
         ReadCapacityUnits: 5
@@ -46,12 +44,14 @@ Resources:
     Metadata:
       BuildMethod: makefile
     Properties:
-      Handler: dist/functions/SearchMovies
+      Handler: dist/src/functions/SearchMovies.SearchMovies
       Description: A function that searches for a movie from the given string.
       Runtime: nodejs14.x
       MemorySize: 128
       Timeout: 60
       Policies:
+        - DynamoDBReadPolicy:
+            TableName: !Ref TableMovies
         - DynamoDBWritePolicy:
             TableName: !Ref TableMovies
       Layers:
@@ -59,6 +59,10 @@ Resources:
       Environment:
         Variables:
           MOVIESTABLE: !Ref TableMovies
+          MOVIESTABLE_HASHKEY: movieItemType
+          MOVIESTABLE_SORTKEY: movieCompositeImdbID
+          HASH_MOVIES: movie
+          HASH_BOOKMARKS: bookmark
           APIKEY: 925eba2
       Events:
         ApiKey:
@@ -67,15 +71,13 @@ Resources:
             RestApiId: !Ref APIMovies
             Path: /movie/search
             Method: POST
-            Auth:
-              ApiKeyRequired: true
 
   FunctionBookmarkMovie:
     Type: AWS::Serverless::Function
     Metadata:
       BuildMethod: makefile
     Properties:
-      Handler: dist/functions/BookmarkMovie
+      Handler: dist/src/functions/BookmarkMovie.BookmarkMovie
       Description: A function that bookmarks a movie from the given imdbID.
       Runtime: nodejs14.x
       MemorySize: 128
@@ -95,15 +97,13 @@ Resources:
             RestApiId: !Ref APIMovies
             Path: /movie/bookmarks/{imdbID}/add
             Method: POST
-            Auth:
-              ApiKeyRequired: true
 
   FunctionListBookmarkedMovies:
     Type: AWS::Serverless::Function
     Metadata:
       BuildMethod: makefile
     Properties:
-      Handler: dist/functions/ListBookmarkedMovies
+      Handler: dist/src/functions/ListBookmarkedMovies.ListBookmarkedMovies
       Description: A function that lists bookmarked movies.
       Runtime: nodejs14.x
       MemorySize: 128
@@ -123,5 +123,3 @@ Resources:
             RestApiId: !Ref APIMovies
             Path: /movie/bookmarks/list
             Method: POST
-            Auth:
-              ApiKeyRequired: true

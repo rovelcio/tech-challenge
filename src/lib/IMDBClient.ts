@@ -1,5 +1,5 @@
 import Axios, { AxiosInstance } from "axios";
-import { Movie, RawMovie } from "#types/Movie";
+import { Movie, RawMovie } from "../types/data/Movie";
 
 interface IMDBClientInterface {
   searchMoviesByName(name: string): Promise<Array<Movie>>;
@@ -9,14 +9,14 @@ interface IMDBClientInterface {
 export class IMDBClient implements IMDBClientInterface {
   private _apiClient: AxiosInstance;
 
-  constructor(apiKey: string) {
+  constructor(imdbAPIKey?: string) {
     this._apiClient = Axios.create({
       baseURL: "https://www.omdbapi.com",
     });
-
+    const apiKey = process.env.APIKEY || imdbAPIKey;
     this._apiClient.interceptors.request.use((configuration) => {
       configuration.params = {
-        apiKey: apiKey,
+        apiKey,
         ...configuration.params,
       };
       return configuration;

@@ -1,5 +1,5 @@
-import { Movie } from "#types/Movie";
-import { IMDBClient } from "#lib/IMDBClient";
+import { Movie } from "../../src/types/data/Movie";
+import { IMDBClient } from "../../src/lib/IMDBClient";
 
 const imdbClient = new IMDBClient("925eba28");
 const batmanBegins = new Movie(

@@ -20,7 +20,7 @@ export class Movie implements MovieInterface {
     private _year,
     private _imdbID,
     private _type,
-    private _posterUrl
+    private _posterUrl,
   ) {}
 
   get title() {

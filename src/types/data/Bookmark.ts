@@ -8,7 +8,7 @@ export class Bookmark extends Movie implements BookmarkInterface {
   private _createdAt: Date;
 
   constructor(movie: Movie, createdAt?: Date) {
-    super(movie.title, movie.year, movie.imdbID, movie.type);
+    super(movie.title, movie.year, movie.imdbID, movie.type, movie.posterUrl);
     if (createdAt) {
       this._createdAt = createdAt;
     }
