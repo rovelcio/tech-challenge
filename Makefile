@@ -1,11 +1,11 @@
 build-FunctionSearchMovies:
-	$(MAKE) HANDLER=src/functions/FunctionSearchMovies.ts build-lambda-typescript
+	$(MAKE) HANDLER=src/functions/SearchMovies.ts build-lambda-typescript
 
 build-FunctionBookmarkMovie:
-	$(MAKE) HANDLER=src/functions/FunctionBookmarkMovie.ts build-lambda-typescript
+	$(MAKE) HANDLER=src/functions/BookmarkMovie.ts build-lambda-typescript
 
 build-FunctionListBookmarkedMovies:
-	$(MAKE) HANDLER=src/functions/FunctionListBookmarkedMovies.ts build-lambda-typescript
+	$(MAKE) HANDLER=src/functions/ListBookmarkedMovies.ts build-lambda-typescript
 
 build-lambda-typescript:
 	npm install
@@ -17,6 +17,6 @@ build-lambda-typescript:
 build-TypescriptRuntimeDependenciesLayer:
 	mkdir -p "$(ARTIFACTS_DIR)/nodejs"
 	cp package.json package-lock.json "$(ARTIFACTS_DIR)/nodejs/"
-	sed -i 's/condoplay-core/condoplay-dependency-layer/g' "$(ARTIFACTS_DIR)/nodejs/package.json"
+	sed -i 's/tech-challenge/tech-challenge-dependency-layer/g' "$(ARTIFACTS_DIR)/nodejs/package.json"
 	npm install --production --prefix "$(ARTIFACTS_DIR)/nodejs/"
 	rm "$(ARTIFACTS_DIR)/nodejs/package.json"
