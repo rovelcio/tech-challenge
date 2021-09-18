@@ -9,7 +9,7 @@ Globals:
   Function:
     Environment:
       Variables:
-        APIKEY: 925eba2
+        APIKEY: 925eba28
         MOVIESTABLE: !Ref TableMovies
         MOVIESTABLE_HASHKEY: movieItemType
         MOVIESTABLE_SORTKEY: movieCompositeImdbID
@@ -68,13 +68,28 @@ Resources:
             TableName: !Ref TableMovies
         - DynamoDBWritePolicy:
             TableName: !Ref TableMovies
+        - AWSLambdaRole
+      Environment:
+        Variables:
+          CACHE_FUNCTION: !Ref FunctionCacheImdbSearch
       Events:
-        ApiKey:
+        Api:
           Type: Api
           Properties:
             RestApiId: !Ref APIMovies
             Path: /movie/search
             Method: POST
+
+  FunctionCacheImdbSearch:
+    Type: AWS::Serverless::Function
+    Metadata:
+      BuildMethod: makefile
+    Properties:
+      Handler: dist/src/functions/CacheImdbSearch.CacheImdbSearch
+      Description: A function that caches searches made at IMDB API.
+      Policies:
+        - DynamoDBWritePolicy:
+            TableName: !Ref TableMovies
 
   FunctionBookmarkMovie:
     Type: AWS::Serverless::Function
@@ -87,7 +102,7 @@ Resources:
         - DynamoDBWritePolicy:
             TableName: !Ref TableMovies
       Events:
-        ApiKey:
+        Api:
           Type: Api
           Properties:
             RestApiId: !Ref APIMovies
@@ -105,7 +120,7 @@ Resources:
         - DynamoDBReadPolicy:
             TableName: !Ref TableMovies
       Events:
-        ApiKey:
+        Api:
           Type: Api
           Properties:
             RestApiId: !Ref APIMovies

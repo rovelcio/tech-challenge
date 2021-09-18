@@ -1,6 +1,9 @@
 build-FunctionSearchMovies:
 	$(MAKE) HANDLER=src/functions/SearchMovies.ts build-lambda-typescript
 
+build-FunctionCacheImdbSearch:
+	$(MAKE) HANDLER=src/functions/CacheImdbSearch.ts build-lambda-typescript
+
 build-FunctionBookmarkMovie:
 	$(MAKE) HANDLER=src/functions/BookmarkMovie.ts build-lambda-typescript
 
