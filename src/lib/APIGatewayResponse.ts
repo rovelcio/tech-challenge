@@ -7,11 +7,13 @@ interface GenericResponseObject {
 export class APIGatewayResponse {
   static build(
     statusCode: number,
-    body: GenericResponseObject
+    body: GenericResponseObject,
+    headers?: GenericResponseObject
   ): APIGatewayProxyResult {
     return {
       statusCode,
       body: JSON.stringify(body),
+      headers,
     };
   }
 }

@@ -1,5 +1,5 @@
-import { ItemList } from "aws-sdk/clients/dynamodb";
-import { Movie } from "../model/data/Movie";
+import { AttributeMap, ItemList } from "aws-sdk/clients/dynamodb";
+import { Movie, RawMovie } from "../model/data/Movie";
 import { DynamoDBClient } from "./DynamoDBClient";
 
 export class DynamoDBMovieClient extends DynamoDBClient {
@@ -14,18 +14,45 @@ export class DynamoDBMovieClient extends DynamoDBClient {
     this._hashCache = process.env.HASH_CACHE;
   }
 
-  async retrieveCacheOf(searchParameter: string): Promise<ItemList> {
-    const queryParameters = this.buildQueryParameters().exact(
+  async writeSearchToCache(searchParameter: string, searchData: Movie[]) {
+    await Promise.all(
+      searchData.map(async (movie, movieIndex) => {
+        const itemParameter = this.buildQueryParameters().addOrUpdateFrom(
+          this._hashCache,
+          searchParameter + "#" + movieIndex,
+          movie
+        );
+        console.log({ itemParameter });
+        return await this.update(itemParameter).promise();
+      })
+    );
+  }
+
+  async retrieveCachedSearchOf(searchParameter: string): Promise<Movie[]> {
+    const queryParameters = this.buildQueryParameters().getItemsBeginsWith(
       this._hashCache,
-      searchParameter
+      searchParameter + "#"
     );
 
     const query = await this.query(queryParameters).promise();
-    return query.Items;
+    const items = (query.Items || []) as Movie[];
+    return items.map((movie) => Movie.fromDb(movie));
   }
 
-  async locateMovieBy(searchParameter: string): Promise<Array<Movie>> {
-    const queryParameters = this.buildQueryParameters().contains(
+  async locateMovieByImdbID(imdbID: string): Promise<Movie> {
+    const queryParameters = this.buildQueryParameters().getExactItemFrom(
+      this._hashMovie,
+      imdbID
+    );
+
+    const query = await this.get(queryParameters).promise();
+    const item = (query.Item || null) as Movie;
+
+    return item === null ? item : Movie.fromDb(item);
+  }
+
+  async locateMovieByTitle(searchParameter: string): Promise<Movie[]> {
+    const queryParameters = this.buildQueryParameters().getItemsContaining(
       this._hashMovie,
       "title",
       searchParameter
@@ -34,15 +61,6 @@ export class DynamoDBMovieClient extends DynamoDBClient {
     const query = await this.query(queryParameters).promise();
     const resultingItems = (query.Items || []) as Movie[];
 
-    return resultingItems.map(
-      (movie) =>
-        new Movie(
-          movie.title,
-          movie.year,
-          movie.imdbID,
-          movie.type,
-          movie.posterUrl
-        )
-    );
+    return resultingItems.map((movie) => Movie.fromDb(movie));
   }
 }

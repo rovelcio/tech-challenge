@@ -25,26 +25,20 @@ export class IMDBClient implements IMDBClientInterface {
   }
 
   async searchMoviesByName(name: string): Promise<Array<Movie>> {
-    const request = await this._apiClient.get<{ Search: RawMovie[] }>("", {
+    const request = await this._apiClient.get<{
+      Search: RawMovie[];
+      Response: "True" | "False";
+    }>("", {
       params: {
         s: encodeURI(name),
       },
     });
+
     const response = [];
 
-    if (request.status === 200) {
-      request.data.Search.filter(
-        (rawMovie) => rawMovie.Type === "movie"
-      ).forEach((rawMovie) =>
-        response.push(
-          new Movie(
-            rawMovie.Title,
-            rawMovie.Year,
-            rawMovie.imdbID,
-            rawMovie.Type,
-            rawMovie.Poster
-          )
-        )
+    if (request.data.Response === "True") {
+      request.data.Search.forEach((rawMovie) =>
+        response.push(Movie.fromImdb(rawMovie))
       );
     }
 
@@ -59,14 +53,6 @@ export class IMDBClient implements IMDBClientInterface {
 
     const rawMovie = request.data;
 
-    return request.status === 200 && rawMovie.Type === "movie"
-      ? new Movie(
-          rawMovie.Title,
-          rawMovie.Year,
-          rawMovie.imdbID,
-          rawMovie.Type,
-          rawMovie.Poster
-        )
-      : null;
+    return request.data.Response === "True" ? Movie.fromImdb(rawMovie) : null;
   }
 }

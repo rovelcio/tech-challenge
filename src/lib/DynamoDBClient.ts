@@ -8,12 +8,24 @@ interface DynamicExpressionPayloadMap {
 }
 
 interface QueryParametersBuilderInterface {
-  contains: (
+  getItemsContaining: (
     hashKey: string,
     attributeName: string,
     attributeValue: string
   ) => DocumentClient.QueryInput;
-  exact: (hashKey: string, sortKey: string) => DocumentClient.QueryInput;
+  getItemsBeginsWith: (
+    hashKey: string,
+    sortKey: string
+  ) => DocumentClient.QueryInput;
+  getExactItemFrom: (
+    hashKey: string,
+    sortKey: string
+  ) => DocumentClient.GetItemInput;
+  addOrUpdateFrom: (
+    hashKey: string,
+    sortKey: string,
+    object: Object
+  ) => DocumentClient.UpdateItemInput;
 }
 
 export class DynamoDBClient extends DocumentClient {
@@ -30,11 +42,7 @@ export class DynamoDBClient extends DocumentClient {
 
   buildQueryParameters(): QueryParametersBuilderInterface {
     return {
-      contains: (
-        hashKey: string,
-        attributeName: string,
-        attributeValue: string
-      ) => ({
+      getItemsContaining: (hashKey, attributeName, attributeValue) => ({
         TableName: this._tableName,
         KeyConditionExpression: this.buildQueryParts().hashKeyOnly(),
         FilterExpression: `contains(${attributeName}, :${attributeName})`,
@@ -43,40 +51,59 @@ export class DynamoDBClient extends DocumentClient {
           [":" + attributeName]: attributeValue,
         },
       }),
-      exact: (hashKey: string, sortKey: string) => ({
+      getItemsBeginsWith: (hashKey, sortKey) => ({
         TableName: this._tableName,
-        KeyConditionExpression: this.buildQueryParts().primaryKeyExact(),
+        KeyConditionExpression: this.buildQueryParts().sortKeyBeginsWith(),
         ExpressionAttributeValues: {
           [":" + this._hashKey]: hashKey,
           [":" + this._sortKey]: sortKey,
         },
       }),
+      getExactItemFrom: (hashKey, sortKey) => ({
+        TableName: this._tableName,
+        Key: {
+          [this._hashKey]: hashKey,
+          [this._sortKey]: sortKey,
+        },
+      }),
+      addOrUpdateFrom: (hashKey, sortKey, object) => {
+        const [UpdateExpression, ExpressionAttributeValues] =
+          this.updateExpression(object);
+
+        return {
+          TableName: this._tableName,
+          Key: {
+            [this._hashKey]: hashKey,
+            [this._sortKey]: sortKey,
+          },
+          UpdateExpression,
+          ExpressionAttributeValues,
+        };
+      },
     };
   }
 
-  buildQueryParts() {
+  private buildQueryParts() {
     return {
       hashKeyOnly: () => `${this._hashKey} = :${this._hashKey}`,
-      primaryKeyExact: () =>
-        `${this._hashKey} = :${this._hashKey} and ${this._sortKey} = :${this._sortKey}`,
+      sortKeyBeginsWith: () =>
+        `${this._hashKey} = :${this._hashKey} and begins_with(${this._sortKey}, :${this._sortKey})`,
     };
   }
 
   updateExpression(
     payload: DynamicExpressionPayloadMap
   ): [string, ExpressionAttributeValueMap] {
-    let expression = String();
-    let expressionValueMap = {};
+    let expression = "set";
+    let values = {};
 
     for (const key in payload) {
-      expression += `${key} = :${key},`;
-      expressionValueMap[`:${key}`] = payload[key];
+      expression += ` ${key} = :${key},`;
+      values[`:${key}`] = payload[key];
     }
 
-    const result = expression.split(String());
-    return [
-      result.slice(0, result.length - 1).join(String()),
-      expressionValueMap,
-    ];
+    let finalExpression = expression.split("");
+    finalExpression.pop();
+    return [finalExpression.join(""), values];
   }
 }
