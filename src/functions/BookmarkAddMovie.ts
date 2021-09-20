@@ -18,6 +18,11 @@ export const BookmarkAddMovie = async (
   }
 
   const movie = await imdbClient.getMovieById(imdbID);
+
+  if (!movie) {
+    return APIGatewayResponse.build(404, { imdbID, movie });
+  }
+
   const addedMovie = await dynamoDbClient.bookmarkAddMovie(imdbID, movie);
   return APIGatewayResponse.build(addedMovie ? 200 : 502, { addedMovie });
 };
