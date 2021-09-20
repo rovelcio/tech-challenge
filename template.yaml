@@ -117,7 +117,7 @@ Resources:
       Handler: dist/src/functions/BookmarkRemoveMovie.BookmarkRemoveMovie
       Description: A function that removes a bookmark from the given imdbID.
       Policies:
-        - DynamoDBWritePolicy:
+        - DynamoDBCrudPolicy:
             TableName: !Ref TableMovies
       Events:
         Api:
