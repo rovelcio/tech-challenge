@@ -4,6 +4,7 @@
   "description": "Implementaçao da Tech Challenge Sthima por Rovelcio Junior.",
   "private": true,
   "scripts": {
+    "setup": "npm install && sam build && sam deploy --guided",
     "build": "tsc",
     "deploy": "rm -rf .aws-sam/ dist/ && npm run test && sam build && sam deploy",
     "test": "jest --verbose"
