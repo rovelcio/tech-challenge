@@ -21,6 +21,7 @@ interface QueryParametersBuilderInterface {
     hashKey: string,
     sortKey: string
   ) => DocumentClient.GetItemInput;
+  getAllFromHashKey: (hashKey: string) => DocumentClient.QueryInput;
   addOrUpdateFrom: (
     hashKey: string,
     sortKey: string,
@@ -64,6 +65,13 @@ export class DynamoDBClient extends DocumentClient {
         Key: {
           [this._hashKey]: hashKey,
           [this._sortKey]: sortKey,
+        },
+      }),
+      getAllFromHashKey: (hashKey: string) => ({
+        TableName: this._tableName,
+        KeyConditionExpression: this.buildQueryParts().hashKeyOnly(),
+        ExpressionAttributeValues: {
+          [":" + this._hashKey]: hashKey,
         },
       }),
       addOrUpdateFrom: (hashKey, sortKey, object) => {
