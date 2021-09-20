@@ -91,12 +91,12 @@ Resources:
         - DynamoDBWritePolicy:
             TableName: !Ref TableMovies
 
-  FunctionBookmarkMovie:
+  FunctionBookmarkAddMovie:
     Type: AWS::Serverless::Function
     Metadata:
       BuildMethod: makefile
     Properties:
-      Handler: dist/src/functions/BookmarkMovie.BookmarkMovie
+      Handler: dist/src/functions/BookmarkAddMovie.BookmarkAddMovie
       Description: A function that bookmarks a movie from the given imdbID.
       Policies:
         - DynamoDBWritePolicy:
@@ -106,8 +106,26 @@ Resources:
           Type: Api
           Properties:
             RestApiId: !Ref APIMovies
-            Path: /movie/bookmarks/{imdbID}/add
+            Path: /bookmark/{imdbID}
             Method: POST
+
+  FunctionBookmarkRemoveMovie:
+    Type: AWS::Serverless::Function
+    Metadata:
+      BuildMethod: makefile
+    Properties:
+      Handler: dist/src/functions/BookmarkRemoveMovie.BookmarkRemoveMovie
+      Description: A function that removes a bookmark from the given imdbID.
+      Policies:
+        - DynamoDBWritePolicy:
+            TableName: !Ref TableMovies
+      Events:
+        Api:
+          Type: Api
+          Properties:
+            RestApiId: !Ref APIMovies
+            Path: /bookmark/{imdbID}
+            Method: DELETE
 
   FunctionListBookmarkedMovies:
     Type: AWS::Serverless::Function
@@ -124,5 +142,5 @@ Resources:
           Type: Api
           Properties:
             RestApiId: !Ref APIMovies
-            Path: /movie/bookmarks/list
-            Method: POST
+            Path: /bookmark
+            Method: GET

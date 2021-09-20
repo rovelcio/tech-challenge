@@ -63,4 +63,27 @@ export class DynamoDBMovieClient extends DynamoDBClient {
 
     return resultingItems.map((movie) => Movie.fromDb(movie));
   }
+
+  async bookmarkList(): Promise<Movie[]> {
+    return null;
+  }
+
+  async bookmarkAddMovie(imdbID: string, movie: Movie): Promise<boolean> {
+    const itemParameters = this.buildQueryParameters().addOrUpdateFrom(
+      this._hashBookmark,
+      imdbID,
+      movie
+    );
+    const addOrUpdateItem = await this.update(itemParameters).promise();
+    return !!addOrUpdateItem.$response.data;
+  }
+
+  async bookmarkRemoveMovie(imdbID: string): Promise<boolean> {
+    const itemParameters = this.buildQueryParameters().getExactItemFrom(
+      this._hashBookmark,
+      imdbID
+    );
+    const deleteItem = await this.delete(itemParameters).promise();
+    return !!deleteItem.$response.data;
+  }
 }
